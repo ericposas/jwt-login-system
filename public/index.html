@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <script
+			  src="https://code.jquery.com/jquery-3.4.1.js"
+			  integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
+			  crossorigin="anonymous"></script>
+  </head>
+  <body>
+    <div id="root">
+      <script>
+        $.ajax({
+          url: '/users',
+          type: 'GET',
+          headers: {
+            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImVyaWMucG9zYXMiLCJpYXQiOjE1ODI1ODYxODYsImV4cCI6MTU4Mjc1ODk4NiwiaXNzIjoiand0LWxvZ2luLXN5c3RlbSJ9.skEJtuIgCaoKWjraB35VAA0QZtKKkJXgzTGHtzWxAio"
+          },
+          success: function(data){
+            console.log(data)
+            data.success.map(item => {
+              var div = document.createElement('div')
+              var br = document.createElement('br')
+              div.innerHTML = item.username
+              div.style.padding = '20px'
+              div.style.margin = '5px'
+              div.style.backgroundColor = 'green'
+              div.style.display = 'inline-block'
+              div.style.borderRadius = '3px'
+              div.style.color = '#fff'
+              div.style.fontFamily = 'Arial'
+              div.style.border = '2px solid darkgreen'
+              document.body.appendChild(div)
+              document.body.appendChild(br)
+            })
+          }
+        })
+      </script>
+    </div>
+  </body>
+</html>
