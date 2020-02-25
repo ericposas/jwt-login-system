@@ -7,6 +7,11 @@ const setToken = token => {
   }
 }
 
+const getToken = () => {
+  if (localStorage && localStorage.getItem('jwt-login-system-token')) return localStorage.getItem('jwt-login-system-token')
+  else return false
+}
+
 const actions = {
 
   login: ({ email, password }, callback) => {
@@ -29,8 +34,8 @@ const actions = {
 
   getUsers: (callback) => {
     return (dispatch, getState) => {
-      if (localStorage && localStorage.getItem('jwt-login-system-token')) {
-        let token = localStorage.getItem('jwt-login-system-token')
+      let token = getToken()
+      if (token) {
         axios.get('/users', { headers: { Authorization: `Bearer ${token}` } })
           .then(data => {
             if (data.data.success) {
