@@ -1,12 +1,9 @@
 import User from './models/User'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
+import jwtOptions from './utils/jwtOptions'
 
 const controller = {
-
-  home: (req, res) => {
-    res.send('Homepage.')
-  },
 
   viewUsers: (req, res) => {
     User.find({})
@@ -16,54 +13,51 @@ const controller = {
 
   register: (req, res) => {
 
-    if (!req.body.username || !req.body.email || !req.body.password) res.send({ error: 'incorrect params sent' })
-
-    const insertUser = hash => {
-      User({
-        username: req.body.username,
-        email: req.body.email,
-        password: hash
+    if (req.body.username && req.body.email && req.body.password) {
+      const insertUser = hash => {
+        User({
+          username: req.body.username,
+          email: req.body.email,
+          password: hash
+        })
+        .save()
+        .then(doc => res.send({ success: 'successfuly registered!' }))
+        .catch(err => res.send({ error: err.errmsg }))
+      }
+      bcrypt.genSalt(10, (err, salt) => {
+        bcrypt.hash(req.body.password, salt, (err, hash) => insertUser(hash))
       })
-      .save()
-      .then(doc => {
-        res.send({ success: 'successfuly registered!' })
-      })
-      .catch(err => res.send({ error: err.errmsg }))
+    } else {
+      res.send({ error: 'incorrect params sent' })
     }
-    bcrypt.genSalt(10, (err, salt) => {
-      bcrypt.hash(req.body.password, salt, (err, hash) => insertUser(hash))
-    })
 
   },
 
   login: (req, res) => {
 
-    if (!req.body.email || !req.body.password) res.send({ error: 'invalid params' })
-
-    User.findOne({ email: req.body.email })
-      .then(doc => {
-        bcrypt.compare(req.body.password, doc.password, (err, match) => {
-          if (match && !err) {
-            // res.send({ success: 'now do the jwt token part' })
-            let encodedJwt = jwt.sign(
-              {
-                username: doc.username
-              },
-              process.env.JWT_SECRET,
-              {
-                expiresIn: '2d',
-                issuer: 'jwt-login-system'
-              }
-            )
-            res.send({ success: encodedJwt })
-          } else {
-            res.send({ error: 'password is incorrect' })
-          }
+    if (req.body.email && req.body.password) {
+      User.findOne({ email: req.body.email })
+        .then(doc => {
+          bcrypt.compare(req.body.password, doc.password, (err, match) => {
+            if (match && !err) {
+              let user = Object.assign({}, doc._doc)
+              res.send({
+                success: {
+                  user: user,
+                  token: jwt.sign({ username: doc.username }, process.env.JWT_SECRET, jwtOptions)
+                }
+              })
+            } else {
+              res.send({ error: 'password is incorrect' })
+            }
+          })
         })
-      })
-      .catch(err => res.send({ error: err.errmsg }))
+        .catch(err => res.send({ error: 'error occurred finding user' }))
+      } else {
+        res.send({ error: 'invalid params' })
+      }
 
-  }
+    }
 
 }
 

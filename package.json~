@@ -5,11 +5,9 @@
   "main": "index.js",
   "scripts": {
     "react:dev": "webpack --development --watch",
-    "express:dev": "nodemon --ignore 'react-src/*' --exec babel-node express-src/server.js"
+    "express:dev": "nodemon --ignore react-src/* --exec babel-node express-src/server.js"
   },
-  "proxy": "http://localhost:3000",
   "dependencies": {
-    "@material-ui/core": "^4.9.4",
     "axios": "^0.19.1",
     "bcrypt": "^3.0.7",
     "body-parser": "^1.19.0",
